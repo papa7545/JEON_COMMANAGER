@@ -19,6 +19,7 @@ namespace JEON_CManager
         TimerForm s_form = new TimerForm();
         GlobalHooking LockKey = new GlobalHooking();
         string URLHOME = @"http://google.co.kr";
+        string DBURL = @"http://google.co.kr";
 
         public mainForm()
         {
