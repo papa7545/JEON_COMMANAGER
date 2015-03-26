@@ -7,3 +7,13 @@ D:\JEON\Github\JEON_COMMANAGER\JEON_CManager\bin\Debug\JEON_CManager.exe
 D:\JEON\Github\JEON_COMMANAGER\JEON_CManager\bin\Debug\JEON_CManager.pdb
 D:\JEON\Github\JEON_COMMANAGER\JEON_CManager\obj\Debug\JEON_CManager.exe
 D:\JEON\Github\JEON_COMMANAGER\JEON_CManager\obj\Debug\JEON_CManager.pdb
+D:\JEON_COMMANAGER\bin\Debug\JEON_CManager.exe.config
+D:\JEON_COMMANAGER\obj\Debug\JEON_CManager.exe
+D:\JEON_COMMANAGER\obj\Debug\JEON_CManager.pdb
+D:\JEON_COMMANAGER\bin\Debug\JEON_CManager.exe
+D:\JEON_COMMANAGER\bin\Debug\JEON_CManager.pdb
+D:\JEON_COMMANAGER\obj\Debug\JEON_CManager.csprojResolveAssemblyReference.cache
+D:\JEON_COMMANAGER\obj\Debug\JEON_CManager.mainForm.resources
+D:\JEON_COMMANAGER\obj\Debug\JEON_CManager.Properties.Resources.resources
+D:\JEON_COMMANAGER\obj\Debug\JEON_CManager.csproj.GenerateResource.Cache
+D:\JEON_COMMANAGER\obj\Debug\JEON_CManager.TimerForm.resources

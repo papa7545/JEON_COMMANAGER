@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hsgd_COM_Managers", "WindowsFormsApplication1\hsgd_COM_Managers.csproj", "{717F3506-42AC-48F0-A4A4-366E5F0A3EE9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JEON_CManager", "JEON_CManager.csproj", "{717F3506-42AC-48F0-A4A4-366E5F0A3EE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
