@@ -97,7 +97,7 @@ namespace JEON_CManager
             foreach (string line in lines)
             {
                 if (line.Split('|')[1] == "CLASS")
-                    name_Class = line.Split('|')[0];
+                    name_Class = line.Split('|')[2];
 
                 if (line.Split('|')[2] == textBox2.Text)
                 {
@@ -105,18 +105,18 @@ namespace JEON_CManager
                     var NAME = line.Split('|')[1];
                     var STDNUM = line.Split('|')[2];
 
-                    var r = MessageBox.Show("학년/반 - " + name_Class
-                    + Environment.NewLine + "번호 - " + CLASSNUM
+                    var r = MessageBox.Show("학년/반 - " + name_Class + " " + CLASSNUM + "번"
                     + Environment.NewLine + "이름 - " + NAME
                                + Environment.NewLine + "학번 - " + STDNUM
                                  + Environment.NewLine + "위 정보가 본인이 맞으며 사용하는데 동의 하십니까?", "로그인", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
+                    
                     if (r == DialogResult.Yes)
                     {
                         s_form.Show();
                         s_form.Location = new Point(Convert.ToInt32(Screen.PrimaryScreen.Bounds.Width * 0.82f), Convert.ToInt32(Screen.PrimaryScreen.Bounds.Height * 0.01f));
-                        s_form.text_stdNum.Text = line.Split('|')[2];
-                        s_form.text_name.Text = line.Split('|')[1];
+                        s_form.text_stdNum.Text = STDNUM;
+                        s_form.text_name.Text = NAME;
+                        s_form.classnum.Text = CLASSNUM;
                         LockKey.UnlockKeyboard();
                         this.Hide();
                     }
@@ -124,11 +124,9 @@ namespace JEON_CManager
                         textBox2.Text = "";
                     return;
                 }
-
-                else
+                if(line.Split('|')[0] == "endline")
                 {
                     MessageBox.Show("학번이 잘못 되었거나 서버상에 정보가 존재하지 않습니다. \n담당자에게 연락해주세요.", "학번 오류");
-                    return;
                 }
             }
         }
