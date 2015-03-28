@@ -116,7 +116,7 @@ namespace JEON_CManager
                         s_form.Location = new Point(Convert.ToInt32(Screen.PrimaryScreen.Bounds.Width * 0.82f), Convert.ToInt32(Screen.PrimaryScreen.Bounds.Height * 0.01f));
                         s_form.text_stdNum.Text = STDNUM;
                         s_form.text_name.Text = NAME;
-                        s_form.classnum.Text = CLASSNUM;
+                        s_form.classnum.Text = name_Class + " " + CLASSNUM;
                         LockKey.UnlockKeyboard();
                         this.Hide();
                     }
