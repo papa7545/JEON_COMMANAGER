@@ -8,8 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
-using MySql.Data.Types;
 
 namespace JEON_CManager
 {
@@ -82,18 +80,33 @@ namespace JEON_CManager
         private void button1_Click(object sender, EventArgs e)
         {
 
+            string name_Class = "";
+
             if (textBox2.Text.Length != 10)
             {
                 MessageBox.Show("학번을 제대로 입력해주세요","학번 오류");
                 return;
             }
-            
-            string[] lines = System.IO.File.ReadAllLines(@"D:\JEON_COMMANAGER\tempdb.txt",Encoding.GetEncoding("ks_c_5601-1987"));
+
+            string[] lines = System.IO.File.ReadAllLines(@"D:\JEON_COMMANAGER\stdnum.jdb", Encoding.GetEncoding("ks_c_5601-1987"));
 
             foreach(string line in lines.Where(t => t.Split('|')[0] == textBox2.Text))
             {
-                var r = MessageBox.Show("이름 - " + line.Split('|')[1] 
-                               + Environment.NewLine + "학번 - " + line.Split('|')[0]
+                if(line.Split('|')[1] == "CLASS")
+                {
+                    name_Class = line.Split('|')[2];
+                }
+                var CLASSNUM = line.Split('|')[0];
+                var NAME = line.Split('|')[1];
+                var STDNUM = line.Split('|')[2];
+
+
+                
+
+                var r = MessageBox.Show( "학년/반 - " + name_Class
+                    + Environment.NewLine + "번호 - " + CLASSNUM
+                    + Environment.NewLine + "이름 - " + NAME 
+                               + Environment.NewLine + "학번 - " + STDNUM
                                  + Environment.NewLine + "위 정보가 본인이 맞으며 사용하는데 동의 하십니까?","로그인",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
                 if (r == DialogResult.Yes)
                 {
