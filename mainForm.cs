@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 namespace JEON_CManager
 {
     public partial class mainForm : Form
@@ -17,7 +18,7 @@ namespace JEON_CManager
         TimerForm s_form = new TimerForm();
         GlobalHooking LockKey = new GlobalHooking();
         string URLHOME = @"http://google.co.kr";
-        string DBURL = @"http://google.co.kr";
+        string DBURL = @"https://raw.githubusercontent.com/papa7545/JEON_COMMANAGER/master/stdnum.jdb";
 
         public mainForm()
         {
@@ -80,48 +81,56 @@ namespace JEON_CManager
         private void button1_Click(object sender, EventArgs e)
         {
 
-            string name_Class = "";
+            string name_Class = "2학년";
 
             if (textBox2.Text.Length != 10)
             {
                 MessageBox.Show("학번을 제대로 입력해주세요","학번 오류");
                 return;
             }
+            string tempFile = System.IO.Path.GetTempFileName();
+            System.Net.WebClient loader = new System.Net.WebClient();
+            loader.DownloadFile(DBURL, tempFile);
 
-            string[] lines = System.IO.File.ReadAllLines(@"D:\JEON_COMMANAGER\stdnum.jdb", Encoding.GetEncoding("ks_c_5601-1987"));
+            string[] lines = System.IO.File.ReadAllLines(tempFile, Encoding.GetEncoding("ks_c_5601-1987"));
 
-            foreach(string line in lines.Where(t => t.Split('|')[0] == textBox2.Text))
+            foreach (string line in lines)
             {
-                if(line.Split('|')[1] == "CLASS")
+                if (line.Split('|')[1] == "CLASS")
+                    name_Class = line.Split('|')[0];
+
+                if (line.Split('|')[2] == textBox2.Text)
                 {
-                    name_Class = line.Split('|')[2];
-                }
-                var CLASSNUM = line.Split('|')[0];
-                var NAME = line.Split('|')[1];
-                var STDNUM = line.Split('|')[2];
+                    var CLASSNUM = line.Split('|')[0];
+                    var NAME = line.Split('|')[1];
+                    var STDNUM = line.Split('|')[2];
 
-
-                
-
-                var r = MessageBox.Show( "학년/반 - " + name_Class
+                    var r = MessageBox.Show("학년/반 - " + name_Class
                     + Environment.NewLine + "번호 - " + CLASSNUM
-                    + Environment.NewLine + "이름 - " + NAME 
+                    + Environment.NewLine + "이름 - " + NAME
                                + Environment.NewLine + "학번 - " + STDNUM
-                                 + Environment.NewLine + "위 정보가 본인이 맞으며 사용하는데 동의 하십니까?","로그인",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
-                if (r == DialogResult.Yes)
-                {
-                    s_form.Show();
-                    s_form.Location = new Point(Convert.ToInt32(Screen.PrimaryScreen.Bounds.Width * 0.82f), Convert.ToInt32(Screen.PrimaryScreen.Bounds.Height * 0.01f));
-                    s_form.text_stdNum.Text = line.Split('|')[0];
-                    s_form.text_name.Text = line.Split('|')[1];
-                    LockKey.UnlockKeyboard();
-                    this.Hide();
+                                 + Environment.NewLine + "위 정보가 본인이 맞으며 사용하는데 동의 하십니까?", "로그인", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                    if (r == DialogResult.Yes)
+                    {
+                        s_form.Show();
+                        s_form.Location = new Point(Convert.ToInt32(Screen.PrimaryScreen.Bounds.Width * 0.82f), Convert.ToInt32(Screen.PrimaryScreen.Bounds.Height * 0.01f));
+                        s_form.text_stdNum.Text = line.Split('|')[2];
+                        s_form.text_name.Text = line.Split('|')[1];
+                        LockKey.UnlockKeyboard();
+                        this.Hide();
+                    }
+                    else if (r == DialogResult.No)
+                        textBox2.Text = "";
+                    return;
                 }
-                else if(r == DialogResult.No)
-                    textBox2.Text = "";
-                return;
+
+                else
+                {
+                    MessageBox.Show("학번이 잘못 되었거나 서버상에 정보가 존재하지 않습니다. \n담당자에게 연락해주세요.", "학번 오류");
+                    return;
+                }
             }
-            MessageBox.Show("학번이 잘못 되었거나 서버상에 정보가 존재하지 않습니다. \n담당자에게 연락해주세요.","학번 오류");
         }
 
         private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
