@@ -8,17 +8,65 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 
 namespace JEON_CManager
 {
     public partial class mainForm : Form
     {
+        static public class TopMostMessageBox
+        {
+            static public DialogResult Show(string message)
+            {
+                return Show(message, string.Empty, MessageBoxButtons.OK);
+            }
+
+            static public DialogResult Show(string message, string title)
+            {
+                return Show(message, title, MessageBoxButtons.OK);
+            }
+
+            static public DialogResult Show(string message, string title,
+                MessageBoxButtons buttons)
+            {
+
+                // Create a host form that is a TopMost window which will be the 
+                // parent of the MessageBox.
+                Form topmostForm = new Form();
+
+
+                topmostForm.ShowIcon = false;
+                topmostForm.ShowInTaskbar = false;
+                // We do not want anyone to see this window so position it off the 
+                // visible screen and make it as small as possible
+                topmostForm.Size = new System.Drawing.Size(1, 1);
+                topmostForm.StartPosition = FormStartPosition.Manual;
+                System.Drawing.Rectangle rect = SystemInformation.VirtualScreen;
+                topmostForm.Location = new System.Drawing.Point(rect.Bottom + 10,
+                    rect.Right + 10);
+                topmostForm.Show();
+                // Make this form the active form and make it TopMost
+                topmostForm.Focus();
+                topmostForm.BringToFront();
+                topmostForm.TopMost = true;
+                // Finally show the MessageBox with the form just created as its owner
+                DialogResult result = MessageBox.Show(topmostForm, message, title,
+                    buttons);
+                topmostForm.Dispose(); // clean it up all the way
+
+                return result;
+            }
+        }
 
         TimerForm s_form = new TimerForm();
         GlobalHooking LockKey = new GlobalHooking();
         string URLHOME = @"http://google.co.kr";
         string DBURL = @"https://raw.githubusercontent.com/papa7545/JEON_COMMANAGER/master/stdnum.jdb";
+        string CLASSNUM;
+        string NAME;
+        string STDNUM;
+        string name_Class = "2학년";
 
         public mainForm()
         {
@@ -29,13 +77,11 @@ namespace JEON_CManager
             GlobalHooking LockKey = new GlobalHooking();
             LockKey.LockKeyboard();
             
-
         }
 
 
         private void mainForm_Load(object sender, EventArgs e)
         {
-            this.TopMost = true;
             textBox2.Location = new Point(Convert.ToInt32(Screen.PrimaryScreen.Bounds.Width * textBox2.Location.X / 1000f), Convert.ToInt32(Screen.PrimaryScreen.Bounds.Height * textBox2.Location.Y / 1000f));
             textBox2.Size = new Size(Convert.ToInt32(Screen.PrimaryScreen.Bounds.Width * textBox2.Size.Width / 1000f), Convert.ToInt32(Screen.PrimaryScreen.Bounds.Height * textBox2.Size.Height / 1000f));
 
@@ -81,13 +127,25 @@ namespace JEON_CManager
         private void button1_Click(object sender, EventArgs e)
         {
 
-            string name_Class = "2학년";
+
+            Thread t1 = new Thread(new ThreadStart(checkDB));
+
 
             if (textBox2.Text.Length != 10)
             {
-                MessageBox.Show("학번을 제대로 입력해주세요","학번 오류");
+                TopMostMessageBox.Show("학번을 제대로 입력해주세요","학번 오류");
                 return;
             }
+
+            t1.Start();
+            
+            
+            
+
+        }
+        private void checkDB()
+        {
+
             string tempFile = System.IO.Path.GetTempFileName();
             System.Net.WebClient loader = new System.Net.WebClient();
             loader.DownloadFile(DBURL, tempFile);
@@ -101,33 +159,69 @@ namespace JEON_CManager
 
                 if (line.Split('|')[2] == textBox2.Text)
                 {
-                    var CLASSNUM = line.Split('|')[0];
-                    var NAME = line.Split('|')[1];
-                    var STDNUM = line.Split('|')[2];
+                    CLASSNUM = line.Split('|')[0];
+                    NAME = line.Split('|')[1];
+                    STDNUM = line.Split('|')[2];
 
-                    var r = MessageBox.Show("학년/반 - " + name_Class + " " + CLASSNUM + "번"
+                    var r = TopMostMessageBox.Show("학년/반 - " + name_Class + " " + CLASSNUM + "번"
                     + Environment.NewLine + "이름 - " + NAME
                                + Environment.NewLine + "학번 - " + STDNUM
-                                 + Environment.NewLine + "위 정보가 본인이 맞으며 사용하는데 동의 하십니까?", "로그인", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    
+                                 + Environment.NewLine + "위 정보가 본인이 맞으며 사용하는데 동의 하십니까?", "로그인", MessageBoxButtons.YesNo);
+
+
+
                     if (r == DialogResult.Yes)
                     {
-                        s_form.Show();
-                        s_form.Location = new Point(Convert.ToInt32(Screen.PrimaryScreen.Bounds.Width * 0.82f), Convert.ToInt32(Screen.PrimaryScreen.Bounds.Height * 0.01f));
-                        s_form.text_stdNum.Text = STDNUM;
-                        s_form.text_name.Text = NAME;
-                        s_form.classnum.Text = name_Class + " " + CLASSNUM;
-                        LockKey.UnlockKeyboard();
-                        this.Hide();
+                        this.SetHide();
                     }
                     else if (r == DialogResult.No)
-                        textBox2.Text = "";
+                        this.SetText("");
+
                     return;
                 }
-                if(line.Split('|')[0] == "endline")
+                if (line.Split('|')[0] == "endline")
                 {
                     MessageBox.Show("학번이 잘못 되었거나 서버상에 정보가 존재하지 않습니다. \n담당자에게 연락해주세요.", "학번 오류");
                 }
+            }
+        }
+
+        delegate void SetTextCallback(string text);
+        private void SetText(string text)
+        {
+            // InvokeRequired required compares the thread ID of the
+            // calling thread to the thread ID of the creating thread.
+            // If these threads are different, it returns true.
+            if (this.textBox2.InvokeRequired)
+            {
+                SetTextCallback d = new SetTextCallback(SetText);
+                this.Invoke(d, new object[] { text });
+            }
+            else
+            {
+                this.textBox2.Text = text;
+            }
+        }
+        delegate void SetHideCallback();
+        private void SetHide()
+        {
+            // InvokeRequired required compares the thread ID of the
+            // calling thread to the thread ID of the creating thread.
+            // If these threads are different, it returns true.
+            if (this.textBox2.InvokeRequired)
+            {
+                SetHideCallback d = new SetHideCallback(SetHide);
+                this.Invoke(d, new object[] { });
+            }
+            else
+            {
+                s_form.Show();
+                s_form.Location = new Point(Convert.ToInt32(Screen.PrimaryScreen.Bounds.Width * 0.82f), Convert.ToInt32(Screen.PrimaryScreen.Bounds.Height * 0.01f));
+                s_form.text_stdNum.Text = STDNUM;
+                s_form.text_name.Text = NAME;
+                s_form.classnum.Text = name_Class + " " + CLASSNUM;
+                LockKey.UnlockKeyboard();
+                this.Hide();
             }
         }
 
@@ -160,4 +254,5 @@ namespace JEON_CManager
         }
 
     }
+
 }
