@@ -18,6 +18,7 @@ namespace JEON_CManager
         public static int m = 0;
         public static int s = 0;
         public static Uri uriAdd = new Uri(@"ftp://112.175.184.72/log.txt");
+        public static DirectoryInfo Folder = new DirectoryInfo(@"D:/J_temp/");
 
         public TimerForm()
         {
@@ -29,41 +30,57 @@ namespace JEON_CManager
 
         void TimerForm_Disposed(object sender, EventArgs e)
         {
-            string fileName = "D:\\test.txt";
-
-            FileStream fs = new FileStream(fileName, FileMode.Append, FileAccess.Write);
-            StreamWriter sw = new StreamWriter(fs, Encoding.Default);
-            sw.WriteLine("karuru.com");
-            sw.Close();
-            fs.Close();
-
-
-            System.Net.FtpWebRequest ftpReq = (System.Net.FtpWebRequest)
-                System.Net.WebRequest.Create(uriAdd);
-            ftpReq.Credentials = new System.Net.NetworkCredential("papa7545", "fldzmdi1");
-            ftpReq.Method = System.Net.WebRequestMethods.Ftp.UploadFile;
-            ftpReq.KeepAlive = false;
-            ftpReq.UseBinary = false;
-            ftpReq.UsePassive = false;
-            System.IO.Stream reqStrm = ftpReq.GetRequestStream();
-            fs = new System.IO.FileStream(
-                fileName, System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.Read);
-
-            byte[] buffer = new byte[1024];
-            while (true)
+            try
             {
-                int readSize = fs.Read(buffer, 0, buffer.Length);
-                if (readSize == 0)
-                    break;
-                reqStrm.Write(buffer, 0, readSize);
+                if (!Folder.Exists)
+                    Folder.Create();
+
+                string tempFile = Folder.FullName + @"/log.txt";
+
+                using (System.Net.WebClient request = new System.Net.WebClient())
+                {
+                    request.Credentials = new System.Net.NetworkCredential("papa7545", "fldzmdi1");
+
+                    request.DownloadFileAsync(uriAdd, tempFile);
+                }
+                FileStream fs = new FileStream(tempFile, FileMode.Append, FileAccess.Write);
+                StreamWriter sw = new StreamWriter(fs, Encoding.Default);
+                sw.WriteLine("["+DateTime.Now+"]"+ "테스트");
+                sw.Close();
+                fs.Close();
+
+
+
+                System.Net.FtpWebRequest ftpReq = (System.Net.FtpWebRequest)
+                    System.Net.WebRequest.Create(uriAdd);
+                ftpReq.Credentials = new System.Net.NetworkCredential("papa7545", "fldzmdi1");
+                ftpReq.Method = System.Net.WebRequestMethods.Ftp.UploadFile;
+                ftpReq.KeepAlive = false;
+                ftpReq.UseBinary = false;
+                ftpReq.UsePassive = false;
+                System.IO.Stream reqStrm = ftpReq.GetRequestStream();
+                fs = new System.IO.FileStream(tempFile, System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.Read);
+
+                byte[] buffer = new byte[1024];
+                while (true)
+                {
+                    int readSize = fs.Read(buffer, 0, buffer.Length);
+                    if (readSize == 0)
+                        break;
+                    reqStrm.Write(buffer, 0, readSize);
+                }
+
+                fs.Close();
+                reqStrm.Close();
+
+                m = 0;
+                s = 0;
+                h = 0;
             }
-
-            fs.Close();
-            reqStrm.Close();
-
-            m = 0;
-            s = 0;
-            h = 0;
+            catch
+            {
+                MessageBox.Show("ERROR 로그되지 않았습니다.");
+            }
 
         }
 

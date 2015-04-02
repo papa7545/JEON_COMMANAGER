@@ -70,6 +70,7 @@ namespace JEON_CManager
 
         public mainForm()
         {
+            this.TopMost = true;
             InitializeComponent();
             this.FormBorderStyle = FormBorderStyle.None;
             this.Size = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
@@ -126,22 +127,14 @@ namespace JEON_CManager
 
         private void button1_Click(object sender, EventArgs e)
         {
-
-
             Thread t1 = new Thread(new ThreadStart(checkDB));
-
 
             if (textBox2.Text.Length != 10)
             {
                 TopMostMessageBox.Show("학번을 제대로 입력해주세요","학번 오류");
                 return;
             }
-
             t1.Start();
-            
-            
-            
-
         }
         private void checkDB()
         {
